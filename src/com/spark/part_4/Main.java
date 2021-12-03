@@ -24,7 +24,7 @@ public class Main {
 //		data.createOrReplaceTempView("data");
 //		long cnt1 = data.count(); // 541909
 		
-		data.flatMap(new FlatMapFunction<Row, Row>() {
+		data.where("Description is not null").flatMap(new FlatMapFunction<Row, Row>() {
 			private static final long serialVersionUID = 1L;
 			private int cnt = 0;
 			
@@ -42,10 +42,6 @@ public class Main {
 			}
 		}, RowEncoder.apply(new StructType().add("number", "integer").add("word", "string").add("lit", "integer"))).createOrReplaceTempView("data");
 		
-		spark.sql("select word, count(lit) from data group by word").show();
-		
-//		long cnt2 = spark.sql("select word from data").count();
-//		System.out.println(cnt1 + " " + cnt2);
-//		System.out.println(cnt1);
+		spark.sql("select word, count(lit) as count from data group by word order by count desc").show();
 	}
 }
